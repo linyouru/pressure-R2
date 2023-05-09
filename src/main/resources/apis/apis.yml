@@ -1,0 +1,100 @@
+swagger: "2.0"
+info:
+  title: Demo APIs
+  version: "2.0"
+  description: Use VSCode plugin [OpenAPI (Swagger) Editor](https://marketplace.visualstudio.com/items?itemName=42Crunch.vscode-openapi) to edit this document.
+host: localhost:8618
+schemes:
+  - http
+  - https
+
+paths:
+  /v1/login:
+    post:
+      summary: 用户登录
+      tags:
+        - auth
+      operationId: login
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: rememberMe
+          in: query
+          type: boolean
+          required: true
+          description: 记住我
+          default: true
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/LoginRequest"
+      responses:
+        200:
+          description: success
+        400:
+          description: parameter error
+        500:
+          description: server error
+  /v1/logout:
+    get:
+      summary: 用户登出
+      tags:
+        - auth
+      operationId: logout
+      responses:
+        200:
+          description: success
+        401:
+          description: unauthorized
+
+# common parameters
+parameters:
+  queryPageSize:
+    name: page_size
+    in: query
+    type: integer
+    required: false
+    default: 20
+    description: 每页条数
+  queryCurrentPage:
+    name: current_page
+    in: query
+    type: integer
+    required: false
+    default: 1
+    description: 当前页
+
+# common data structure
+definitions:
+  BaseResp:
+    type: object
+    properties:
+      message:
+        type: string
+  OnePageData:
+    type: object
+    properties:
+      pagination:
+        type: object
+        properties:
+          totalSize:
+            type: integer
+            example: 1000
+          currentPage:
+            type: integer
+            example: 1
+          pageSize:
+            type: integer
+            example: 20
+  LoginRequest:
+    type: object
+    required:
+      - userName
+      - password
+    properties:
+      userName:
+        type: string
+      password:
+        type: string
