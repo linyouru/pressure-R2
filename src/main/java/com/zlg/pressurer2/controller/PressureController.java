@@ -1,9 +1,13 @@
 package com.zlg.pressurer2.controller;
 
+import io.swagger.annotations.Api;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 
+@RestController
+@Api(tags = "pressure")
 public class PressureController implements PressureApi{
 
     @Override

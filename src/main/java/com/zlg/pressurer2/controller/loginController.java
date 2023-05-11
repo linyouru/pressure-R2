@@ -43,7 +43,6 @@ public class loginController implements AuthApi{
                 .retrieve()
                 .bodyToMono(LoginRes.class);
 
-        System.out.println(1);
         LoginRes res = loginResMono.block();
 
         //获取设备token
