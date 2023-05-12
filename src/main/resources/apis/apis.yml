@@ -13,21 +13,10 @@ paths:
     post:
       summary: 用户登录
       tags:
-        - auth
+        - test
       operationId: login
       produces:
         - "application/json"
-      parameters:
-        - name: rememberMe
-          in: query
-          type: boolean
-          required: true
-          description: 记住我
-          default: true
-        - name: body
-          in: body
-          schema:
-            $ref: "#/definitions/LoginRequest"
       responses:
         200:
           description: success
@@ -48,7 +37,7 @@ paths:
         - in: query
           name: devType
           type: string
-          description: 设备类型,目前支持invert、candtu-200、candtu-400、can-common
+          description: 设备类型,目前支持invert、can-common
       responses:
         200:
           description: success
@@ -74,7 +63,7 @@ paths:
         - in: query
           name: deviceType
           type: string
-          description: 设备类型,目前支持invert、candtu-200、candtu-400、can-common
+          description: 设备类型,目前支持invert、can-common
       responses:
         200:
           description: success
@@ -178,16 +167,6 @@ definitions:
           pageSize:
             type: integer
             example: 20
-  LoginRequest:
-    type: object
-    required:
-      - userName
-      - password
-    properties:
-      userName:
-        type: string
-      password:
-        type: string
   devicesInfo:
     type: object
     properties:

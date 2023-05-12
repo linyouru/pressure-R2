@@ -1,6 +1,7 @@
 package com.zlg.pressurer2.service;
 
 import com.zlg.pressurer2.common.GlobalDeviceList;
+import com.zlg.pressurer2.common.GlobalWebClient;
 import com.zlg.pressurer2.pojo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +22,8 @@ import java.util.concurrent.Future;
 @Service
 public class DeviceService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String BASE_URL = "http://192.168.24.91/v1";
     private static final HashMap<String, Integer> PUBLIC_INFO_MODEL = new HashMap<>();
-    private static WebClient webClient;
+    private static WebClient webClient = GlobalWebClient.getWebClient();
     private static final Integer TENANT_TOTAL = 10;
     @Resource
     private AsyncTaskService asyncTaskService;
@@ -32,8 +32,6 @@ public class DeviceService {
 
     //初始化拿标准设备类型信息
     static {
-        webClient = WebClient.builder().baseUrl(BASE_URL).codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(5 * 1024 * 1024)).build();
-
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setPassword("12345678");
         loginRequest.setType(1);
@@ -81,7 +79,7 @@ public class DeviceService {
 
         long startTime = System.currentTimeMillis();
         for (int i = 1; i <= TENANT_TOTAL; i++) {
-            Future<DeviceInfoList> deviceInfoListFuture = asyncTaskService.asyncGetDeviceInfoList(devType, loginRequest, i,
+            Future<DeviceInfoList> deviceInfoListFuture = asyncTaskService.getDeviceInfoList(devType, loginRequest, i,
                     PUBLIC_INFO_MODEL, webClient);
             futureList.add(deviceInfoListFuture);
         }
