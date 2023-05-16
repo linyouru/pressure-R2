@@ -24,7 +24,7 @@ public class DeviceService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final HashMap<String, Integer> PUBLIC_INFO_MODEL = new HashMap<>();
     private static WebClient webClient = GlobalWebClient.getWebClient();
-    private static final Integer TENANT_TOTAL = 10;
+    private static final Integer TENANT_TOTAL = 1;
     @Resource
     private AsyncTaskService asyncTaskService;
     @Resource

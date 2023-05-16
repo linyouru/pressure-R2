@@ -22,7 +22,7 @@ public class TaskExecutorConfig implements AsyncConfigurer {
         // 设置最大线程数
         executor.setMaxPoolSize(16);
         // 设置队列大小
-        executor.setQueueCapacity(200);
+        executor.setQueueCapacity(2000);
         // 设置线程名前缀
         executor.setThreadNamePrefix("AsyncExecutor-");
         //拒绝策略

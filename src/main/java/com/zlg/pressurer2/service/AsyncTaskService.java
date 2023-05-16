@@ -31,7 +31,7 @@ public class AsyncTaskService {
 
     @Async
     public Future<DeviceInfoList> getDeviceInfoList(String devType, LoginRequest loginRequest, int i,
-                                                         HashMap<String, Integer> publicInfoModel, WebClient webClient) {
+                                                    HashMap<String, Integer> publicInfoModel, WebClient webClient) {
         loginRequest.setUsername("pressure" + i);
         LoginRes loginRes = apiTenantLogin(loginRequest, webClient);
 
@@ -80,7 +80,7 @@ public class AsyncTaskService {
     }
 
     @Async
-    public Future<MqttClient> deviceOnline(String deviceType, String thirdThingsId, String tenantName, String parentsJson, WebClient webClient) {
+    public Future<PressureMqttClient> deviceOnline(String deviceType, String thirdThingsId, String tenantName, String parentsJson, WebClient webClient) {
         DeviceTokenRes deviceTokenRes = getDeviceTokenRes(parentsJson, webClient);
         assert deviceTokenRes != null;
         DeviceTokenResDataMqtt mqtt = deviceTokenRes.getData().getMqtt();
@@ -91,12 +91,16 @@ public class AsyncTaskService {
         try {
             MqttClient mqttClient = MqttHelper.getmqttClient(serverUri.trim(), clientId, clientId, deviceToken);
             MqttMessage mqttMessage = new MqttMessage("设备上线".getBytes());
+//            logger.info("[线程ID： {}] 设备{} 上线时刻: {}", Thread.currentThread().getId(), clientId, System.currentTimeMillis());
             //开发调试时Qos设为0，因为在虚拟机里收不到服务端响应
             mqttMessage.setQos(0);
             mqttClient.publish("/d2s/" + tenantName + "/" + deviceType + "/" + thirdThingsId + "/online", mqttMessage);
-//                    mqttClient.disconnect();
-//                    mqttClient.close();
-            return new AsyncResult<>(mqttClient);
+            PressureMqttClient pressureMqttClient = new PressureMqttClient();
+            pressureMqttClient.setMqttClient(mqttClient);
+            pressureMqttClient.setInfoModelName(deviceType);
+            pressureMqttClient.setTenantName(tenantName);
+            pressureMqttClient.setThirdThingsId(thirdThingsId);
+            return new AsyncResult<>(pressureMqttClient);
         } catch (MqttException e) {
             throw new RuntimeException(e);
         }
@@ -104,6 +108,7 @@ public class AsyncTaskService {
 
     /**
      * 获取设备登录token
+     *
      * @param parentsJson
      * @param webClient
      * @return
@@ -122,4 +127,22 @@ public class AsyncTaskService {
         return deviceTokenResMono.block();
     }
 
+    @Async
+    public void deviceSendData(PressureMqttClient pressureMqttClient, String send, String type) {
+        MqttClient mqttClient = pressureMqttClient.getMqttClient();
+        String topic = new StringBuilder("/d2s/")
+                .append(pressureMqttClient.getTenantName())
+                .append("/").append(pressureMqttClient.getInfoModelName())
+                .append("/").append(pressureMqttClient.getThirdThingsId())
+                .append("/").append(type).toString();
+        MqttMessage mqttMessage = new MqttMessage(send.getBytes());
+        mqttMessage.setQos(0);
+        try {
+            mqttClient.publish(topic, mqttMessage);
+        } catch (MqttException e) {
+            logger.error("mqttClient上报数据出错,topic:{}", topic, e);
+            throw new RuntimeException(e);
+        }
+        logger.info("[线程ID： {}] time: {} topic:{}", Thread.currentThread().getId(), System.currentTimeMillis(), topic);
+    }
 }

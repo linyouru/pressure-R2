@@ -35,7 +35,7 @@ public class loginController implements TestApi {
         loginRequest.setType(1);
         Mono<LoginRequest> req = Mono.just(loginRequest);
 
-        String baseUrl = "http://192.168.24.91/v1";
+        String baseUrl = "http://192.168.24.10/v1";
         WebClient webClient = WebClient.create(baseUrl);
 //        Mono<LoginRes> loginResMono = webClient.post()
 //                .uri("/control/sessions/tenant-manager")
@@ -47,8 +47,8 @@ public class loginController implements TestApi {
 //        LoginRes res = loginResMono.block();
 
         //获取设备token
-//        String parentsJson = "{\"devices\":[{\"devid\":\"invent_05\",\"devtype\":\"invert\"}],\"password\":\"ASfa@#regksajFAwvI)\",\"username\":\"invert\"}";
-        String parentsJson = "{\"devices\":[{\"devid\":\"device_invert_1_500\",\"devtype\":\"invert\"}],\"password\":\"ASfa@#regksajFAwvI)\",\"username\":\"invert\"}";
+        String parentsJson = "{\"devices\":[{\"devid\":\"invent_05\",\"devtype\":\"invert\"}],\"password\":\"ASfa@#regksajFAwvI)\",\"username\":\"invert\"}";
+//        String parentsJson = "{\"devices\":[{\"devid\":\"device_invert_1_500\",\"devtype\":\"invert\"}],\"password\":\"ASfa@#regksajFAwvI)\",\"username\":\"invert\"}";
         Mono<DeviceTokenRes> deviceTokenResMono = webClient.post()
                 .uri("/login")
                 .contentType(MediaType.APPLICATION_JSON)

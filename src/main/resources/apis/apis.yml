@@ -71,24 +71,51 @@ paths:
           description: parameter error
         500:
           description: server error
-  /v1/pressure/start:
+  /v1/pressure/device_onlien:
     get:
-      summary: 开始压测
-      description: 将在一段时间内尽量均匀的使设备上线，并在设置周期内尽量均匀的上报数据
+      summary: 上线压测设备
+      description: 设备将在一段时间能均匀上线，必须先上线设备才能进行压测
       tags:
         - pressure
-      operationId: pressureStart
+      operationId: deviceOnline
       produces:
         - "application/json"
       parameters:
         - in: query
           name: deviceNumber
           type: integer
-          description: 压测的设备数
+          description: 上线的设备数，也是压测的设备数
         - in: query
           name: deviceType
           type: string
           description: 压测的设备类型
+        - in: query
+          name: part
+          type: integer
+          description: 每批上线多少设备
+        - in: query
+          name: rest
+          type: integer
+          description: 两批设备上线间隔(ms)
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: "#/definitions/BaseResp"
+        400:
+          description: parameter error
+        500:
+          description: server error
+  /v1/pressure/start:
+    get:
+      summary: 开始压测
+      description: 在设置周期内尽量均匀的上报数据,压测设备为上线的设备
+      tags:
+        - pressure
+      operationId: pressureStart
+      produces:
+        - "application/json"
+      parameters:
         - in: query
           name: period
           type: integer
@@ -101,13 +128,11 @@ paths:
           name: data
           type: string
           description: 上报的数据，为base64字符串
-        - in: query
-          name: onlineTime
-          type: integer
-          description: 设备上线的时限，单位：秒;设备会尽量在时限内均匀上线
       responses:
         200:
           description: success
+          schema:
+            $ref: "#/definitions/BaseResp"
         400:
           description: parameter error
         500:
@@ -115,7 +140,7 @@ paths:
   /v1/pressure/stop:
     get:
       summary: 停止压测
-      description: 停止压测
+      description: 压测设备下线,断开mqtt连接,停止定时任务
       tags:
         - pressure
       operationId: pressureStop
@@ -124,6 +149,8 @@ paths:
       responses:
         200:
           description: success
+          schema:
+            $ref: "#/definitions/BaseResp"
         400:
           description: parameter error
         500:
