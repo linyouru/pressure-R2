@@ -1,18 +1,16 @@
 package com.zlg.pressurer2.controller;
 
-import com.zlg.pressurer2.common.GlobaMqttClientList;
+import com.zlg.pressurer2.common.GlobalMqttClientList;
 import com.zlg.pressurer2.controller.model.ApiBaseResp;
 import com.zlg.pressurer2.pojo.PressureMqttClient;
 import com.zlg.pressurer2.service.PressureService;
 import io.swagger.annotations.Api;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -47,7 +45,7 @@ public class PressureController implements PressureApi {
 
     @Override
     public ResponseEntity<ApiBaseResp> pressureStop() {
-        ArrayList<PressureMqttClient> mqttClientList = GlobaMqttClientList.mqttClientList;
+        ArrayList<PressureMqttClient> mqttClientList = GlobalMqttClientList.mqttClientList;
         pressureService.pressureStop();
         if (null != mqttClientList) {
             for (PressureMqttClient pressureMqttClient : mqttClientList) {

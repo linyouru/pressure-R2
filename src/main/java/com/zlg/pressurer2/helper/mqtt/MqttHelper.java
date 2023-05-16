@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MqttHelper {
 
-    public static MqttClient getmqttClient(String serverURI, String clientId, String userName, String password) throws MqttException {
+    public static MqttClient getMqttClient(String serverURI, String clientId, String userName, String password) throws MqttException {
 
         MqttClientPersistence persistence = new MemoryPersistence();
         MqttClient client = new MqttClient(serverURI, clientId, persistence);

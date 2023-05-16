@@ -4,24 +4,18 @@ import com.zlg.pressurer2.helper.mqtt.MqttHelper;
 import com.zlg.pressurer2.pojo.DeviceTokenRes;
 import com.zlg.pressurer2.pojo.DeviceTokenResDataMqtt;
 import com.zlg.pressurer2.pojo.LoginRequest;
-import com.zlg.pressurer2.pojo.LoginRes;
 import io.swagger.annotations.Api;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import java.util.Map;
+
 
 @RestController
 @Api(tags = "test")
@@ -67,7 +61,7 @@ public class loginController implements TestApi {
         String serverUri = "tcp://" + mqtt.getHost() + ":" + mqtt.getPort();
         String clientId = "invert:invent_05";
         try {
-            MqttClient mqttClient = MqttHelper.getmqttClient(serverUri.trim(), clientId, clientId, deviceTokenRes.getData().getToken());
+            MqttClient mqttClient = MqttHelper.getMqttClient(serverUri.trim(), clientId, clientId, deviceTokenRes.getData().getToken());
             MqttMessage mqttMessage = new MqttMessage("设备上线".getBytes());
             //开发调试时Qos设为0，因为在虚拟机里收不到服务端响应
             mqttMessage.setQos(0);

@@ -3,24 +3,20 @@ package com.zlg.pressurer2.controller;
 import com.zlg.pressurer2.common.GlobalDeviceList;
 import com.zlg.pressurer2.controller.model.ApiDevicesInfo;
 import com.zlg.pressurer2.pojo.DeviceInfo;
-import com.zlg.pressurer2.service.AsyncTaskService;
 import com.zlg.pressurer2.service.DeviceService;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 @RestController
 @Api(tags = "device")
-public class DeviceContorller implements DeviceApi {
+public class DeviceController implements DeviceApi {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource

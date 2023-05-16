@@ -2,7 +2,6 @@ package com.zlg.pressurer2.helper.mqtt;
 
 import com.zlg.pressurer2.pojo.PressureMqttClient;
 import com.zlg.pressurer2.service.AsyncTaskService;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,10 +12,10 @@ public class SendData implements Runnable {
     private List<PressureMqttClient> mqttClientList;
     private AsyncTaskService asyncTaskService;
     private Integer period;
-    private String send;
+    private byte[] send;
     private String topic;
 
-    public void setSend(String send) {
+    public void setSend(byte[] send) {
         this.send = send;
     }
 

@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -89,7 +88,7 @@ public class AsyncTaskService {
         String clientId = deviceType + ":" + thirdThingsId;
         String deviceToken = deviceTokenRes.getData().getToken();
         try {
-            MqttClient mqttClient = MqttHelper.getmqttClient(serverUri.trim(), clientId, clientId, deviceToken);
+            MqttClient mqttClient = MqttHelper.getMqttClient(serverUri.trim(), clientId, clientId, deviceToken);
             MqttMessage mqttMessage = new MqttMessage("设备上线".getBytes());
 //            logger.info("[线程ID： {}] 设备{} 上线时刻: {}", Thread.currentThread().getId(), clientId, System.currentTimeMillis());
             //开发调试时Qos设为0，因为在虚拟机里收不到服务端响应
@@ -128,14 +127,14 @@ public class AsyncTaskService {
     }
 
     @Async
-    public void deviceSendData(PressureMqttClient pressureMqttClient, String send, String type) {
+    public void deviceSendData(PressureMqttClient pressureMqttClient, byte[] send, String type) {
         MqttClient mqttClient = pressureMqttClient.getMqttClient();
         String topic = new StringBuilder("/d2s/")
                 .append(pressureMqttClient.getTenantName())
                 .append("/").append(pressureMqttClient.getInfoModelName())
                 .append("/").append(pressureMqttClient.getThirdThingsId())
                 .append("/").append(type).toString();
-        MqttMessage mqttMessage = new MqttMessage(send.getBytes());
+        MqttMessage mqttMessage = new MqttMessage(send);
         mqttMessage.setQos(0);
         try {
             mqttClient.publish(topic, mqttMessage);
