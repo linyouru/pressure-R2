@@ -26,23 +26,21 @@ public class DeviceController implements DeviceApi {
 
     @Override
     public ResponseEntity<Void> addDevices(Integer deviceNumber, String deviceType) {
-        ArrayList<DeviceInfo> allDeviceInfoList = globalDeviceList.getAllDeviceInfoList();
-        logger.info("当前全部租户设备总数: {}",allDeviceInfoList.size());
-        return null;
+        return ResponseEntity.ok(null);
     }
 
     @Override
     public ResponseEntity<ApiDevicesInfo> getDevices(String devType) {
-
-        try {
-            Integer deviceTotal = deviceService.getDeviceTotal(devType);
-            ApiDevicesInfo res = new ApiDevicesInfo();
-            res.setTotal(deviceTotal);
-            res.setDeviceType(devType);
-            return ResponseEntity.ok().body(res);
-        } catch (ExecutionException | InterruptedException e) {
-            logger.error("getDevices error: ",e);
-            throw new RuntimeException(e);
-        }
+        return ResponseEntity.ok(null);
+//        try {
+//            Integer deviceTotal = deviceService.getDeviceTotal(devType);
+//            ApiDevicesInfo res = new ApiDevicesInfo();
+//            res.setTotal(deviceTotal);
+//            res.setDeviceType(devType);
+//            return ResponseEntity.ok().body(res);
+//        } catch (ExecutionException | InterruptedException e) {
+//            logger.error("getDevices error: ",e);
+//            throw new RuntimeException(e);
+//        }
     }
 }

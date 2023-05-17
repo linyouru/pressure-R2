@@ -28,6 +28,7 @@ paths:
     get:
       summary: 获取压测设备信息
       description: 若云端设备没有变化，则只需要获取一次
+      deprecated: true
       tags:
         - device
       operationId: getDevices
@@ -50,6 +51,7 @@ paths:
     post:
       summary: 新建设备
       description: 新建设备均匀分布在测试租户中
+      deprecated: true
       tags:
         - device
       operationId: addDevices
