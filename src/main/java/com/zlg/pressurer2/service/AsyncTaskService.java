@@ -81,6 +81,7 @@ public class AsyncTaskService {
     @Async
     public Future<PressureMqttClient> deviceOnline(String deviceType, String thirdThingsId, String tenantName, String parentsJson, WebClient webClient) {
         DeviceTokenRes deviceTokenRes = getDeviceTokenRes(parentsJson, webClient);
+//        logger.info("请求响应,thirdThingsId: {} time: {}",thirdThingsId,System.currentTimeMillis());
         assert deviceTokenRes != null;
         DeviceTokenResDataMqtt mqtt = deviceTokenRes.getData().getMqtt();
 
@@ -142,6 +143,6 @@ public class AsyncTaskService {
             logger.error("mqttClient上报数据出错,topic:{}", topic, e);
             throw new RuntimeException(e);
         }
-        logger.info("[线程ID： {}] time: {} topic:{}", Thread.currentThread().getId(), System.currentTimeMillis(), topic);
+//        logger.info("[线程ID： {}] time: {} topic:{}", Thread.currentThread().getId(), System.currentTimeMillis(), topic);
     }
 }

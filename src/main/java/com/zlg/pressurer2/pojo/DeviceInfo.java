@@ -2,20 +2,10 @@ package com.zlg.pressurer2.pojo;
 
 public class DeviceInfo {
 
-    private Integer id;
+    private String name;
     private String third_things_id;
     private Integer tenant_id;
     private String tenant_name;
-    private String name;
-    private Integer is_online;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getThird_things_id() {
         return third_things_id;
@@ -49,23 +39,13 @@ public class DeviceInfo {
         this.name = name;
     }
 
-    public Integer getIs_online() {
-        return is_online;
-    }
-
-    public void setIs_online(Integer is_online) {
-        this.is_online = is_online;
-    }
-
     @Override
     public String toString() {
         return "DeviceInfo{" +
-                "id=" + id +
+                "name='" + name + '\'' +
                 ", third_things_id='" + third_things_id + '\'' +
                 ", tenant_id=" + tenant_id +
                 ", tenant_name='" + tenant_name + '\'' +
-                ", name='" + name + '\'' +
-                ", is_online=" + is_online +
                 '}';
     }
 }

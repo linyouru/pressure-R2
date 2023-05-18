@@ -59,6 +59,7 @@ public class PressureController implements PressureApi {
                     throw new RuntimeException(e);
                 }
             }
+            GlobalMqttClientList.mqttClientList.clear();
         }
         return ResponseEntity.ok(new ApiBaseResp().message("success"));
     }
