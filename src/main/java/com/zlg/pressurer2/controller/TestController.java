@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @Api(tags = "test")
-public class loginController implements TestApi {
+public class TestController implements TestApi {
 
     @Override
     public ResponseEntity<Void> login() {

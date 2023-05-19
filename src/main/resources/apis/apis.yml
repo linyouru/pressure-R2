@@ -9,63 +9,14 @@ schemes:
   - https
 
 paths:
-  /v1/login:
+  /v1/test:
     post:
-      summary: 用户登录
+      summary: 测试mqtt连接
       tags:
         - test
       operationId: login
       produces:
         - "application/json"
-      responses:
-        200:
-          description: success
-        400:
-          description: parameter error
-        500:
-          description: server error
-  /v1/device:
-    get:
-      summary: 获取压测设备信息
-      description: 若云端设备没有变化，则只需要获取一次
-      deprecated: true
-      tags:
-        - device
-      operationId: getDevices
-      produces:
-        - "application/json"
-      parameters:
-        - in: query
-          name: devType
-          type: string
-          description: 设备类型,目前支持invert、can-common
-      responses:
-        200:
-          description: success
-          schema:
-            $ref: "#/definitions/devicesInfo"
-        400:
-          description: parameter error
-        500:
-          description: server error
-    post:
-      summary: 新建设备
-      description: 新建设备均匀分布在测试租户中
-      deprecated: true
-      tags:
-        - device
-      operationId: addDevices
-      produces:
-        - "application/json"
-      parameters:
-        - in: query
-          name: deviceNumber
-          type: integer
-          description: 需要新建的设备数
-        - in: query
-          name: deviceType
-          type: string
-          description: 设备类型,目前支持invert、can-common
       responses:
         200:
           description: success
