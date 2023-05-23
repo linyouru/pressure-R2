@@ -91,22 +91,24 @@ public class AsyncTaskService {
         String serverUri = "tcp://" + mqtt.getHost() + ":" + mqtt.getPort();
         String clientId = deviceType + ":" + thirdThingsId;
         String deviceToken = deviceTokenRes.getData().getToken();
+        MqttClient mqttClient;
         try {
-            MqttClient mqttClient = MqttHelper.getMqttClient(serverUri.trim(), clientId, clientId, deviceToken);
+            mqttClient = MqttHelper.getMqttClient(serverUri.trim(), clientId, clientId, deviceToken);
             MqttMessage mqttMessage = new MqttMessage("设备上线".getBytes());
 //            logger.info("[线程ID： {}] 设备{} 上线时刻: {}", Thread.currentThread().getId(), clientId, System.currentTimeMillis());
             //开发调试时Qos设为0，因为在虚拟机里收不到服务端响应
             mqttMessage.setQos(0);
             mqttClient.publish("/d2s/" + tenantName + "/" + deviceType + "/" + thirdThingsId + "/online", mqttMessage);
-            PressureMqttClient pressureMqttClient = new PressureMqttClient();
-            pressureMqttClient.setMqttClient(mqttClient);
-            pressureMqttClient.setInfoModelName(deviceType);
-            pressureMqttClient.setTenantName(tenantName);
-            pressureMqttClient.setThirdThingsId(thirdThingsId);
-            return new AsyncResult<>(pressureMqttClient);
         } catch (MqttException e) {
+            logger.error("设备mqtt连接错误:{}",e.getMessage());
             throw new RuntimeException(e);
         }
+        PressureMqttClient pressureMqttClient = new PressureMqttClient();
+        pressureMqttClient.setMqttClient(mqttClient);
+        pressureMqttClient.setInfoModelName(deviceType);
+        pressureMqttClient.setTenantName(tenantName);
+        pressureMqttClient.setThirdThingsId(thirdThingsId);
+        return new AsyncResult<>(pressureMqttClient);
     }
 
     /**
