@@ -22,10 +22,10 @@ public class PressureController implements PressureApi {
     private PressureService pressureService;
 
     @Override
-    public ResponseEntity<ApiBaseResp> deviceOnline(Integer deviceNumber, String deviceType, Integer part, Integer rest) {
+    public ResponseEntity<ApiBaseResp> deviceOnline(Integer deviceNumber, String deviceType, Integer part, Integer rest, Integer startUserIndex, Integer startDeviceIndex) {
 
         try {
-            pressureService.deviceOnline(deviceNumber, deviceType, part, rest);
+            pressureService.deviceOnline(deviceNumber, deviceType, part, rest,startUserIndex,startDeviceIndex);
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -33,7 +33,7 @@ public class PressureController implements PressureApi {
     }
 
     @Override
-    public ResponseEntity<ApiBaseResp> pressureStart(Integer period, String topic, String data) {
+    public ResponseEntity<ApiBaseResp> pressureStart(Integer deviceNumber, String deviceType, Integer part, Integer rest, Integer period, String topic, String data, Integer startUserIndex, Integer startDeviceIndex) {
         try {
             pressureService.pressureStart(period, topic, data);
         } catch (ExecutionException | InterruptedException e) {

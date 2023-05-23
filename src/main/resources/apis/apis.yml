@@ -27,7 +27,7 @@ paths:
   /v1/pressure/device_onlien:
     get:
       summary: 上线压测设备
-      description: 设备将在一段时间能均匀上线，必须先上线设备才能进行压测
+      description: 设备将在一段时间能均匀上线
       tags:
         - pressure
       operationId: deviceOnline
@@ -50,6 +50,14 @@ paths:
           name: rest
           type: integer
           description: 两批设备上线间隔(ms)
+        - in: query
+          name: startUserIndex
+          type: integer
+          description: 调度器计算的用户下标
+        - in: query
+          name: startDeviceIndex
+          type: integer
+          description: 调度器计算的设备下标
       responses:
         200:
           description: success
@@ -62,13 +70,29 @@ paths:
   /v1/pressure/start:
     get:
       summary: 开始压测
-      description: 在设置周期内尽量均匀的上报数据,压测设备为上线的设备
+      description: 设备将在一段时间能均匀上线,然后在设置周期内尽量均匀的上报数据
       tags:
         - pressure
       operationId: pressureStart
       produces:
         - "application/json"
       parameters:
+        - in: query
+          name: deviceNumber
+          type: integer
+          description: 上线的设备数，也是压测的设备数
+        - in: query
+          name: deviceType
+          type: string
+          description: 压测的设备类型
+        - in: query
+          name: part
+          type: integer
+          description: 每批上线多少设备
+        - in: query
+          name: rest
+          type: integer
+          description: 两批设备上线间隔(ms)
         - in: query
           name: period
           type: integer
@@ -81,6 +105,14 @@ paths:
           name: data
           type: string
           description: 上报的数据，为base64字符串
+        - in: query
+          name: startUserIndex
+          type: integer
+          description: 调度器计算的用户下标
+        - in: query
+          name: startDeviceIndex
+          type: integer
+          description: 调度器计算的设备下标
       responses:
         200:
           description: success

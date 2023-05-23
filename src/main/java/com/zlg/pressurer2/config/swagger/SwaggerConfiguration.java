@@ -26,7 +26,7 @@ import static java.util.Collections.singletonList;
 public class SwaggerConfiguration {
     private ApiInfo apiInfo(){
         return new ApiInfoBuilder()
-                .title("zlg-R2 压测服务 API")
+                .title("zlg-R2 压测服务执行器 API")
                 .description("描述")
                 .version("1.0.0")
                 .build();

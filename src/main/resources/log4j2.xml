@@ -7,7 +7,7 @@
     <!--变量配置-->
     <Properties>
         <!--应用名称-->
-        <property name="APP_NAME">pressureR2</property>
+        <property name="APP_NAME">pressureR2_execute</property>
         <!--日志存放路径-->
         <property name="LOG_PATH">./logs/${APP_NAME}</property>
         <!--日志备份路径-->

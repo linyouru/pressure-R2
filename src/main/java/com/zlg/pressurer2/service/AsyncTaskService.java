@@ -80,10 +80,13 @@ public class AsyncTaskService {
 
     @Async
     public Future<PressureMqttClient> deviceOnline(String deviceType, String thirdThingsId, String tenantName, String parentsJson, WebClient webClient) {
+//        logger.info("请求设备token开始,thirdThingsId: {} time: {}",thirdThingsId,System.currentTimeMillis());
         DeviceTokenRes deviceTokenRes = getDeviceTokenRes(parentsJson, webClient);
-//        logger.info("请求响应,thirdThingsId: {} time: {}",thirdThingsId,System.currentTimeMillis());
+//        logger.info("请求设备token响应,thirdThingsId: {} time: {}",thirdThingsId,System.currentTimeMillis());
         assert deviceTokenRes != null;
         DeviceTokenResDataMqtt mqtt = deviceTokenRes.getData().getMqtt();
+
+//        return new AsyncResult<>(new PressureMqttClient());
 
         String serverUri = "tcp://" + mqtt.getHost() + ":" + mqtt.getPort();
         String clientId = deviceType + ":" + thirdThingsId;

@@ -27,7 +27,6 @@ import java.util.concurrent.*;
 public class PressureService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static WebClient webClient = GlobalWebClient.getWebClient();
-    private List<DeviceInfo> pressureDeviceInfoList;
     private ScheduledFuture<?> scheduledFuture;
 
     @Resource
@@ -35,22 +34,16 @@ public class PressureService {
     @Resource
     private AsyncTaskService asyncTaskService;
 
-    public void deviceOnline(Integer deviceNumber, String deviceType, Integer part, Integer rest) throws InterruptedException, ExecutionException {
-        //目前云平台只准备了最多50万设备
-        if (deviceNumber > 500000) {
-            throw new BizException(HttpStatus.BAD_REQUEST, "pressure.1003");
-        }
+    public void deviceOnline(Integer deviceNumber, String deviceType, Integer part, Integer rest, Integer startUserIndex, Integer startDeviceIndex) throws InterruptedException, ExecutionException {
         if (GlobalMqttClientList.mqttClientList != null && GlobalMqttClientList.mqttClientList.size() != 0) {
             throw new BizException(HttpStatus.BAD_REQUEST, "pressure.1004");
         }
-//        ArrayList<DeviceInfo> allDeviceInfoList = globalDeviceList.getAllDeviceInfoList();
-        ArrayList<DeviceInfo> deviceInfoList = generatedDeviceInfoList(deviceNumber, deviceType);
+        ArrayList<DeviceInfo> deviceInfoList = generatedDeviceInfoList(deviceNumber, deviceType, startUserIndex, startDeviceIndex);
         String deviceSecret = DeviceSecret.DEVICES_SECRET.get(deviceType);
         int i = 1;
         if (deviceInfoList.size() > 0) {
             ArrayList<PressureMqttClient> mqttClients = new ArrayList<>();
             ArrayList<Future<PressureMqttClient>> futureList = new ArrayList<>();
-//            pressureDeviceInfoList = allDeviceInfoList.subList(0, deviceNumber);
             long startTime = System.currentTimeMillis();
             logger.info("开始设备上线,设备数量{}, 当前时间戳{}", deviceInfoList.size(), startTime);
             for (DeviceInfo deviceInfo : deviceInfoList) {
@@ -68,6 +61,7 @@ public class PressureService {
                 i++;
             }
             logger.info("futureList size {}", futureList.size());
+            long futureTime = System.currentTimeMillis();
             for (Future<PressureMqttClient> pressureMqttClientFuture : futureList) {
                 PressureMqttClient pressureMqttClient = pressureMqttClientFuture.get();
                 mqttClients.add(pressureMqttClient);
@@ -75,10 +69,11 @@ public class PressureService {
             long endTime = System.currentTimeMillis();
             logger.info("设备全部上线完成,mqttClient 数量{}, 当前时间戳{}", mqttClients.size(), endTime);
             logger.info("总共耗时{}", endTime - startTime);
+            logger.info("futureTime{}", endTime - futureTime);
             GlobalMqttClientList.mqttClientList = mqttClients;
         } else {
-            logger.error("allDeviceInfoList size is 0");
-            throw new BizException(HttpStatus.BAD_REQUEST, "pressure.1001");
+            logger.error("deviceInfoList size is 0");
+            throw new BizException(HttpStatus.INTERNAL_SERVER_ERROR, "pressure.1001");
         }
 
     }
@@ -108,12 +103,21 @@ public class PressureService {
         }
     }
 
-    private ArrayList<DeviceInfo> generatedDeviceInfoList(Integer deviceNumber, String deviceType) {
+    /**
+     * 构建压测设备信息
+     *
+     * @param deviceNumber     压测设备数
+     * @param deviceType       设备类型
+     * @param startUserIndex   压测用户下标，基于云端模拟数据实现的逻辑
+     * @param startDeviceIndex 压测设备下标
+     * @return 压测设备信息List
+     */
+    private ArrayList<DeviceInfo> generatedDeviceInfoList(Integer deviceNumber, String deviceType, Integer startUserIndex, Integer startDeviceIndex) {
         ArrayList<DeviceInfo> deviceInfos = new ArrayList<>(deviceNumber);
         one:
-        for (int i = 1000; i >= 1; i--) {
+        for (int i = startUserIndex; i <= 1000; i++) {
             if ("invert".equals(deviceType)) {
-                for (int j = 1; j <= 500; j++) {
+                for (int j = startDeviceIndex; j <= 500; j++) {
                     DeviceInfo deviceInfo = new DeviceInfo();
                     deviceInfo.setTenant_name("pressure" + i);
                     deviceInfo.setThird_things_id("device_invert_" + i + "_" + j);
@@ -123,10 +127,10 @@ public class PressureService {
                     }
                 }
             } else if ("can-common".equals(deviceType)) {
-                for (int k = 1; k <= 2; k++) {
+                for (int j = startDeviceIndex; j <= 2; j++) {
                     DeviceInfo deviceInfo = new DeviceInfo();
                     deviceInfo.setTenant_name("pressure" + i);
-                    deviceInfo.setThird_things_id("device_can_" + i + "_" + k);
+                    deviceInfo.setThird_things_id("device_can_" + i + "_" + j);
                     deviceInfos.add(deviceInfo);
                     if (deviceInfos.size() == deviceNumber) {
                         break one;
