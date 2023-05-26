@@ -9,21 +9,6 @@ schemes:
   - https
 
 paths:
-  /v1/test:
-    post:
-      summary: 测试mqtt连接
-      tags:
-        - test
-      operationId: login
-      produces:
-        - "application/json"
-      responses:
-        200:
-          description: success
-        400:
-          description: parameter error
-        500:
-          description: server error
   /v1/pressure/device_onlien:
     get:
       summary: 上线压测设备
