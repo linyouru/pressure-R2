@@ -93,11 +93,11 @@ paths:
         - in: query
           name: startUserIndex
           type: integer
-          description: 调度器计算的用户下标
+          description: 执行器组装设备信息时起始用户,由调度器计算
         - in: query
           name: startDeviceIndex
           type: integer
-          description: 调度器计算的设备下标
+          description: 执行器组装设备信息时起始设备,由调度器计算
       responses:
         200:
           description: success
