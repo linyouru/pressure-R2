@@ -1,10 +1,8 @@
 package com.zlg.pressurer2.service;
 
+import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.zlg.pressurer2.helper.mqtt.MqttHelper;
 import com.zlg.pressurer2.pojo.*;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -14,34 +12,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
-import java.util.HashMap;
+import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.concurrent.Future;
 
 @Component
 public class AsyncTaskService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-//    @Async
-//    public void asyncTest(int i){
-//        logger.info("线程ID：" + Thread.currentThread().getId() +" 线程名字：" +Thread.currentThread().getName()+" 获取租户pressure{}的设备列表", i);
-//    }
-
-    @Async
-    public Future<DeviceInfoList> getDeviceInfoList(String devType, LoginRequest loginRequest, int i,
-                                                    HashMap<String, Integer> publicInfoModel, WebClient webClient) {
-        loginRequest.setUsername("pressure" + i);
-        LoginRes loginRes = apiTenantLogin(loginRequest, webClient);
-
-        String authorization = "Bearer " + loginRes.getToken();
-
-        Integer tenantId = loginRes.getTenant_id();
-        Integer infoModelId = publicInfoModel.get(devType);
-        DeviceInfoList deviceInfoList = apiGetDeviceInfoList(authorization, tenantId, infoModelId, webClient);
-        logger.info("线程ID：" + Thread.currentThread().getId() + " 线程名字：" + Thread.currentThread().getName() + " 获取租户pressure{}的设备列表", i);
-        return new AsyncResult<>(deviceInfoList);
-    }
+    @Resource
+    private MqttHelper mqttHelper;
 
     /**
      * 获取租户设备列表
@@ -61,23 +43,6 @@ public class AsyncTaskService {
         return deviceInfoListMono.block();
     }
 
-    /**
-     * 租户登录
-     *
-     * @param loginRequest 登录请求参数
-     * @return
-     */
-    private LoginRes apiTenantLogin(LoginRequest loginRequest, WebClient webClient) {
-        Mono<LoginRequest> req = Mono.just(loginRequest);
-        Mono<LoginRes> loginResMono = webClient.post()
-                .uri("/control/sessions/tenant-manager")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(req, LoginRequest.class)
-                .retrieve()
-                .bodyToMono(LoginRes.class);
-        return loginResMono.block();
-    }
-
     @Async
     public Future<PressureMqttClient> deviceOnline(String deviceType, String thirdThingsId, String tenantName, String parentsJson, WebClient webClient) {
 //        logger.info("请求设备token开始,thirdThingsId: {} time: {}",thirdThingsId,System.currentTimeMillis());
@@ -86,23 +51,9 @@ public class AsyncTaskService {
         assert deviceTokenRes != null;
         DeviceTokenResDataMqtt mqtt = deviceTokenRes.getData().getMqtt();
 
-//        return new AsyncResult<>(new PressureMqttClient());
-
-        String serverUri = "tcp://" + mqtt.getHost() + ":" + mqtt.getPort();
         String clientId = deviceType + ":" + thirdThingsId;
         String deviceToken = deviceTokenRes.getData().getToken();
-        MqttClient mqttClient;
-        try {
-            mqttClient = MqttHelper.getMqttClient(serverUri.trim(), clientId, clientId, deviceToken);
-            MqttMessage mqttMessage = new MqttMessage("设备上线".getBytes());
-//            logger.info("[线程ID： {}] 设备{} 上线时刻: {}", Thread.currentThread().getId(), clientId, System.currentTimeMillis());
-            //开发调试时Qos设为0，因为在虚拟机里收不到服务端响应
-            mqttMessage.setQos(0);
-            mqttClient.publish("/d2s/" + tenantName + "/" + deviceType + "/" + thirdThingsId + "/online", mqttMessage);
-        } catch (MqttException e) {
-            logger.error("设备mqtt连接错误:{}",e.getMessage());
-            throw new RuntimeException(e);
-        }
+        Mqtt3AsyncClient mqttClient = mqttHelper.getMqttClientByHiveMQ(mqtt.getHost(), mqtt.getPort(), clientId, clientId, deviceToken, deviceType, thirdThingsId, tenantName);
         PressureMqttClient pressureMqttClient = new PressureMqttClient();
         pressureMqttClient.setMqttClient(mqttClient);
         pressureMqttClient.setInfoModelName(deviceType);
@@ -127,27 +78,19 @@ public class AsyncTaskService {
                 .bodyToMono(DeviceTokenRes.class)
                 .doOnError(WebClientResponseException.class, err -> {
                     logger.error("获取设备登录token发生错误：" + err.getRawStatusCode() + " " + err.getResponseBodyAsString());
-                    throw new RuntimeException(err.getResponseBodyAsString());
-                });
+//                    throw new RuntimeException(err.getResponseBodyAsString());
+                })
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)));
         return deviceTokenResMono.block();
     }
 
     @Async
     public void deviceSendData(PressureMqttClient pressureMqttClient, byte[] send, String type) {
-        MqttClient mqttClient = pressureMqttClient.getMqttClient();
-        String topic = new StringBuilder("/d2s/")
+        String sendTopic = new StringBuilder("/d2s/")
                 .append(pressureMqttClient.getTenantName())
                 .append("/").append(pressureMqttClient.getInfoModelName())
                 .append("/").append(pressureMqttClient.getThirdThingsId())
                 .append("/").append(type).toString();
-        MqttMessage mqttMessage = new MqttMessage(send);
-        mqttMessage.setQos(0);
-        try {
-            mqttClient.publish(topic, mqttMessage);
-        } catch (MqttException e) {
-            logger.error("mqttClient上报数据出错,topic:{}", topic, e);
-            throw new RuntimeException(e);
-        }
-//        logger.info("[线程ID： {}] time: {} topic:{}", Thread.currentThread().getId(), System.currentTimeMillis(), topic);
+        pressureMqttClient.getMqttClient().publishWith().topic(sendTopic).payload(send).send();
     }
 }

@@ -9,3 +9,6 @@ spring:
 
 logging:
   config: classpath:log4j2.xml
+
+#执行器绑定的网卡ip
+localAddress: 192.168.174.128

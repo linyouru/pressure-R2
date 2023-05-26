@@ -1,12 +1,13 @@
 package com.zlg.pressurer2.controller;
 
+import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.zlg.pressurer2.common.GlobalMqttClientList;
 import com.zlg.pressurer2.controller.model.ApiBaseResp;
 import com.zlg.pressurer2.pojo.PressureMqttClient;
 import com.zlg.pressurer2.service.PressureService;
 import io.swagger.annotations.Api;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 @Api(tags = "pressure")
 public class PressureController implements PressureApi {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Resource
     private PressureService pressureService;
 
@@ -25,7 +27,7 @@ public class PressureController implements PressureApi {
     public ResponseEntity<ApiBaseResp> deviceOnline(Integer deviceNumber, String deviceType, Integer part, Integer rest, Integer startUserIndex, Integer startDeviceIndex) {
 
         try {
-            pressureService.deviceOnline(deviceNumber, deviceType, part, rest,startUserIndex,startDeviceIndex);
+            pressureService.deviceOnline(deviceNumber, deviceType, part, rest, startUserIndex, startDeviceIndex);
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -35,6 +37,7 @@ public class PressureController implements PressureApi {
     @Override
     public ResponseEntity<ApiBaseResp> pressureStart(Integer deviceNumber, String deviceType, Integer part, Integer rest, Integer period, String topic, String data, Integer startUserIndex, Integer startDeviceIndex) {
         try {
+            pressureService.deviceOnline(deviceNumber, deviceType, part, rest, startUserIndex, startDeviceIndex);
             pressureService.pressureStart(period, topic, data);
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -48,15 +51,11 @@ public class PressureController implements PressureApi {
         ArrayList<PressureMqttClient> mqttClientList = GlobalMqttClientList.mqttClientList;
         pressureService.pressureStop();
         if (null != mqttClientList) {
+            logger.info("当前mqtt client数: {}", mqttClientList.size());
             for (PressureMqttClient pressureMqttClient : mqttClientList) {
-                MqttClient mqttClient = pressureMqttClient.getMqttClient();
-                try {
-                    if (null != mqttClient) {
-                        mqttClient.disconnect();
-                        mqttClient.close();
-                    }
-                } catch (MqttException e) {
-                    throw new RuntimeException(e);
+                Mqtt3AsyncClient mqttClient = pressureMqttClient.getMqttClient();
+                if (null != mqttClient) {
+                    mqttClient.disconnect();
                 }
             }
             GlobalMqttClientList.mqttClientList.clear();

@@ -1,19 +1,19 @@
 package com.zlg.pressurer2.pojo;
 
-import org.eclipse.paho.client.mqttv3.MqttClient;
+import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 
 public class PressureMqttClient {
 
-    private MqttClient mqttClient;
+    private Mqtt3AsyncClient mqttClient;
     private String infoModelName;
     private String tenantName;
     private String thirdThingsId;
 
-    public MqttClient getMqttClient() {
+    public Mqtt3AsyncClient getMqttClient() {
         return mqttClient;
     }
 
-    public void setMqttClient(MqttClient mqttClient) {
+    public void setMqttClient(Mqtt3AsyncClient mqttClient) {
         this.mqttClient = mqttClient;
     }
 

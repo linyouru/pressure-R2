@@ -3,7 +3,6 @@ package com.zlg.pressurer2.service;
 
 import com.zlg.pressurer2.common.DeviceSecret;
 import com.zlg.pressurer2.common.GlobalMqttClientList;
-import com.zlg.pressurer2.common.GlobalDeviceList;
 import com.zlg.pressurer2.common.GlobalWebClient;
 import com.zlg.pressurer2.exception.BizException;
 import com.zlg.pressurer2.helper.mqtt.SendData;
@@ -15,12 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.annotation.Resource;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
 import java.util.concurrent.*;
 
 @Service
@@ -29,8 +24,6 @@ public class PressureService {
     private static WebClient webClient = GlobalWebClient.getWebClient();
     private ScheduledFuture<?> scheduledFuture;
 
-    @Resource
-    private GlobalDeviceList globalDeviceList;
     @Resource
     private AsyncTaskService asyncTaskService;
 
