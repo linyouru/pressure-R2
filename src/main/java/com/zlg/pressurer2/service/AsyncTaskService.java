@@ -25,23 +25,6 @@ public class AsyncTaskService {
     @Resource
     private MqttHelper mqttHelper;
 
-    /**
-     * 获取租户设备列表
-     *
-     * @param authorization token
-     * @param tenantId      租户id
-     * @param infoModelId   设备类型id
-     * @return
-     */
-    private DeviceInfoList apiGetDeviceInfoList(String authorization, Integer tenantId, Integer infoModelId, WebClient webClient) {
-        Mono<DeviceInfoList> deviceInfoListMono = webClient.get()
-                .uri("/things/tenants/" + tenantId + "/things?current_page=1&info_model_ids=" + infoModelId + "&page_size=10000")
-                .header("Authorization", authorization)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(DeviceInfoList.class);
-        return deviceInfoListMono.block();
-    }
 
     @Async
     public Future<PressureMqttClient> deviceOnline(String deviceType, String thirdThingsId, String tenantName, String parentsJson, WebClient webClient) {
