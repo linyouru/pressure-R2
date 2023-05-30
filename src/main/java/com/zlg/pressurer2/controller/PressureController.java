@@ -51,7 +51,7 @@ public class PressureController implements PressureApi {
         ArrayList<PressureMqttClient> mqttClientList = GlobalMqttClientList.mqttClientList;
         pressureService.pressureStop();
         if (null != mqttClientList) {
-            logger.info("当前mqtt client数: {}", mqttClientList.size());
+            logger.debug("当前mqtt client数: {}", mqttClientList.size());
             for (PressureMqttClient pressureMqttClient : mqttClientList) {
                 Mqtt3AsyncClient mqttClient = pressureMqttClient.getMqttClient();
                 if (null != mqttClient) {

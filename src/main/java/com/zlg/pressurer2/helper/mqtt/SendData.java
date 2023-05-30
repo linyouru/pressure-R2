@@ -37,7 +37,7 @@ public class SendData implements Runnable {
 
     @Override
     public void run() {
-        logger.info("[线程ID： {}] 定时任务执行时刻: {}", Thread.currentThread().getId(), System.currentTimeMillis());
+//        logger.debug("[线程ID： {}] 定时任务执行时刻: {}", Thread.currentThread().getId(), System.currentTimeMillis());
         int size = mqttClientList.size();
         int bucket = size / period;
         int startIndex = 0;
@@ -47,7 +47,7 @@ public class SendData implements Runnable {
             endIndex = i * bucket;
             List<PressureMqttClient> pressureMqttClients = mqttClientList.subList(startIndex, endIndex);
             startIndex = endIndex;
-            logger.info("第{}批任务上报,设备数：{}", i, bucket);
+//            logger.debug("第{}批任务上报,设备数：{}", i, bucket);
             for (PressureMqttClient pressureMqttClient : pressureMqttClients) {
                 asyncTaskService.deviceSendData(pressureMqttClient, send, topic);
             }

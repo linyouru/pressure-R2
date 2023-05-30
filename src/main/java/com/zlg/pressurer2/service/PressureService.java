@@ -38,7 +38,7 @@ public class PressureService {
             ArrayList<PressureMqttClient> mqttClients = new ArrayList<>();
             ArrayList<Future<PressureMqttClient>> futureList = new ArrayList<>();
             long startTime = System.currentTimeMillis();
-            logger.info("开始设备上线,设备数量{}, 当前时间戳{}", deviceInfoList.size(), startTime);
+            logger.debug("开始设备上线,设备数量: {}, 当前时间戳: {}", deviceInfoList.size(), startTime);
             for (DeviceInfo deviceInfo : deviceInfoList) {
                 String thirdThingsId = deviceInfo.getThird_things_id();
                 String tenantName = deviceInfo.getTenant_name();
@@ -48,21 +48,21 @@ public class PressureService {
                 futureList.add(mqttClientFuture);
                 //每上线i个设备就休息一下
                 if (i % part == 0) {
-                    logger.info("i = {},主线程休息", i);
+                    logger.debug("i = {},主线程休息", i);
                     Thread.sleep(rest);
                 }
                 i++;
             }
-            logger.info("futureList size {}", futureList.size());
+            logger.debug("futureList size: {}", futureList.size());
             long futureTime = System.currentTimeMillis();
             for (Future<PressureMqttClient> pressureMqttClientFuture : futureList) {
                 PressureMqttClient pressureMqttClient = pressureMqttClientFuture.get();
                 mqttClients.add(pressureMqttClient);
             }
             long endTime = System.currentTimeMillis();
-            logger.info("设备全部上线完成,mqttClient 数量{}, 当前时间戳{}", mqttClients.size(), endTime);
-            logger.info("总共耗时{}", endTime - startTime);
-            logger.info("futureTime{}", endTime - futureTime);
+            logger.debug("设备全部上线完成,mqttClient 数量: {}, 当前时间戳: {}", mqttClients.size(), endTime);
+            logger.debug("总共耗时: {}", endTime - startTime);
+            logger.debug("遍历阻塞队列futureList耗时: {}", endTime - futureTime);
             GlobalMqttClientList.mqttClientList = mqttClients;
         } else {
             logger.error("deviceInfoList size is 0");
@@ -79,7 +79,7 @@ public class PressureService {
         }
         byte[] send = Base64.getDecoder().decode(data);
 
-        logger.info("参与压测的设备数:{}", mqttClientList.size());
+        logger.debug("参与压测的设备数: {}", mqttClientList.size());
         SendData sendData = new SendData();
         sendData.setMqttClientList(mqttClientList);
         sendData.setAsyncTaskService(asyncTaskService);

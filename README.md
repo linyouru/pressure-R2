@@ -17,7 +17,7 @@ docker push ops.zlgcloud.com/library/zws-r2-pressure-execute:master
 
 生成容器:
 ```
-docker run -p 9320:9320 --name pressure_execute -v /data/pressure2/execute/logs:/home/pressure2execute/logs/pressureR2_execute -v /data/pressure2/execute/config:/home/pressure2execute/config -itd ops.zlgcloud.com/library/zws-r2-pressure-execute:master
+docker run -p 9320:9320 --name pressure_execute --net=host -v /data/pressure2/execute/logs:/home/pressure2execute/logs/pressureR2_execute -v /data/pressure2/execute/config:/home/pressure2execute/config -itd ops.zlgcloud.com/library/zws-r2-pressure-execute:master
 ```
 
 ## 给mqtt服务器添加压测节点虚拟网卡的路由
