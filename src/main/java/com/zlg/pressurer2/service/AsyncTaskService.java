@@ -29,7 +29,7 @@ public class AsyncTaskService {
     @Async
     public Future<PressureMqttClient> deviceOnline(String deviceType, String thirdThingsId, String tenantName, String parentsJson, WebClient webClient) {
 //        logger.info("请求设备token开始,thirdThingsId: {} time: {}",thirdThingsId,System.currentTimeMillis());
-        DeviceTokenRes deviceTokenRes = getDeviceTokenRes(parentsJson, webClient);
+        DeviceTokenRes deviceTokenRes = getDeviceTokenRes(parentsJson, webClient, thirdThingsId);
 //        logger.info("请求设备token响应,thirdThingsId: {} time: {}",thirdThingsId,System.currentTimeMillis());
         assert deviceTokenRes != null;
         DeviceTokenResDataMqtt mqtt = deviceTokenRes.getData().getMqtt();
@@ -52,7 +52,7 @@ public class AsyncTaskService {
      * @param webClient
      * @return
      */
-    private DeviceTokenRes getDeviceTokenRes(String parentsJson, WebClient webClient) {
+    private DeviceTokenRes getDeviceTokenRes(String parentsJson, WebClient webClient, String thirdThingsId) {
         Mono<DeviceTokenRes> deviceTokenResMono = webClient.post()
                 .uri("/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -60,7 +60,7 @@ public class AsyncTaskService {
                 .retrieve()
                 .bodyToMono(DeviceTokenRes.class)
                 .doOnError(WebClientResponseException.class, err -> {
-                    logger.error("获取设备登录token发生错误：" + err.getRawStatusCode() + " " + err.getResponseBodyAsString());
+                    logger.error("获取设备[{}]登录token发生错误：" + err.getRawStatusCode() + " " + err.getResponseBodyAsString(), thirdThingsId);
 //                    throw new RuntimeException(err.getResponseBodyAsString());
                 })
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)));

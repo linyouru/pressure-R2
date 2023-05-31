@@ -48,8 +48,8 @@ public class PressureController implements PressureApi {
 
     @Override
     public ResponseEntity<ApiBaseResp> pressureStop() {
-        ArrayList<PressureMqttClient> mqttClientList = GlobalMqttClientList.mqttClientList;
         pressureService.pressureStop();
+        ArrayList<PressureMqttClient> mqttClientList = GlobalMqttClientList.mqttClientList;
         if (null != mqttClientList) {
             logger.debug("当前mqtt client数: {}", mqttClientList.size());
             for (PressureMqttClient pressureMqttClient : mqttClientList) {

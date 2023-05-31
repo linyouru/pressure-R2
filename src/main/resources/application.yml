@@ -12,3 +12,8 @@ logging:
 
 #执行器绑定的网卡ip
 localAddress: 192.168.174.128,192.168.174.10
+
+threadPool:
+  corePoolSize: 80
+  maxPoolSize:  100
+  queueCapacity: 5000
