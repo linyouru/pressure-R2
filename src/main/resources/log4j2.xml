@@ -80,7 +80,7 @@
         -->
 
         <!-- 同步日志配置-->
-        <logger name="com.zlg.zlgpm" level="debug" additivity="false">
+        <logger name="com.zlg.pressurer2" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
             <AppenderRef ref="RollingFileError"/>
