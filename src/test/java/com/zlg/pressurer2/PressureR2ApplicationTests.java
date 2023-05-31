@@ -7,19 +7,28 @@ import org.springframework.util.DigestUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootTest
 class PressureR2ApplicationTests {
 
+    AtomicInteger flag = new AtomicInteger(0);
+    int localAddressTotal = 5;
+
     @Test
     void test() {
-        int flag = 0;
-        int localAddressTotal = 1;
 
+        for (int i = 0; i < 10; i++) {
+            System.out.println(polling());
+        }
+    }
 
-        for (int i = 0; i < 5; i++) {
-            flag = flag < localAddressTotal - 1 ? flag + 1 : 0;
-            System.out.println(flag);
+    int polling(){
+        if(flag.get() < localAddressTotal - 1){
+            return flag.incrementAndGet();
+        }else{
+            flag.set(0);
+            return 0;
         }
     }
 
