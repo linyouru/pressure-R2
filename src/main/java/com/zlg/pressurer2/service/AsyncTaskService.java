@@ -5,6 +5,7 @@ import com.zlg.pressurer2.helper.mqtt.MqttHelper;
 import com.zlg.pressurer2.pojo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -28,10 +29,10 @@ public class AsyncTaskService {
 
     @Async
     public Future<PressureMqttClient> deviceOnline(String deviceType, String thirdThingsId, String tenantName, String parentsJson, WebClient webClient) {
-//        logger.info("请求设备token开始,thirdThingsId: {} time: {}",thirdThingsId,System.currentTimeMillis());
         DeviceTokenRes deviceTokenRes = getDeviceTokenRes(parentsJson, webClient, thirdThingsId);
-//        logger.info("请求设备token响应,thirdThingsId: {} time: {}",thirdThingsId,System.currentTimeMillis());
-        assert deviceTokenRes != null;
+        if (!deviceTokenRes.getResult()) {
+            return null;
+        }
         DeviceTokenResDataMqtt mqtt = deviceTokenRes.getData().getMqtt();
 
         String clientId = deviceType + ":" + thirdThingsId;
@@ -58,12 +59,20 @@ public class AsyncTaskService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(parentsJson)
                 .retrieve()
+                .onStatus(HttpStatus::is4xxClientError, resp -> {
+                    logger.error("获取token客户端请求异常[{}],error: {}", resp.statusCode().value(), resp.statusCode().getReasonPhrase());
+                    return Mono.error(new RuntimeException("客户端请求异常"));
+                })
+                .onStatus(HttpStatus::is5xxServerError, resp -> {
+                    logger.error("获取token服务端异常[{}],error: {}", resp.statusCode().value(), resp.statusCode().getReasonPhrase());
+                    return Mono.error(new RuntimeException("服务端异常"));
+                })
                 .bodyToMono(DeviceTokenRes.class)
                 .doOnError(WebClientResponseException.class, err -> {
                     logger.error("获取设备[{}]登录token发生错误：" + err.getRawStatusCode() + " " + err.getResponseBodyAsString(), thirdThingsId);
-//                    throw new RuntimeException(err.getResponseBodyAsString());
                 })
-                .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)));
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)))
+                .onErrorReturn(new DeviceTokenRes());
         return deviceTokenResMono.block();
     }
 

@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SpringBootTest
 class PressureR2ApplicationTests {
 
-    AtomicInteger flag = new AtomicInteger(0);
+    public  int flag = 0;
     int localAddressTotal = 5;
 
     @Test
@@ -23,11 +23,12 @@ class PressureR2ApplicationTests {
         }
     }
 
-    int polling(){
-        if(flag.get() < localAddressTotal - 1){
-            return flag.incrementAndGet();
-        }else{
-            flag.set(0);
+    synchronized int polling() {
+        if (flag < localAddressTotal - 1) {
+            flag++;
+            return flag;
+        } else {
+            flag = 0;
             return 0;
         }
     }

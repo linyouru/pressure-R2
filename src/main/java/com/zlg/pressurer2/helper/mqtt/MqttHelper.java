@@ -22,8 +22,7 @@ public class MqttHelper {
     @Value(value = "${localAddress}")
     public String localAddress;
     public ArrayList<InetSocketAddress> inetSocketAddressList = new ArrayList<>();
-    //    public volatile int flag = 0;
-    public AtomicInteger flag = new AtomicInteger(0);
+    public int flag = 0;
     public int localAddressTotal = 0;
 
     @PostConstruct
@@ -44,8 +43,8 @@ public class MqttHelper {
                 .serverHost(host)
                 .serverPort(port)
                 .transportConfig()
-                .mqttConnectTimeout(30000, TimeUnit.MILLISECONDS)
-                .socketConnectTimeout(30000, TimeUnit.MILLISECONDS)
+                .mqttConnectTimeout(60000, TimeUnit.MILLISECONDS)
+                .socketConnectTimeout(60000, TimeUnit.MILLISECONDS)
                 .localAddress(inetSocketAddress)
                 .applyTransportConfig()
                 .buildAsync();
@@ -76,11 +75,12 @@ public class MqttHelper {
     /**
      * 线程安全的计算ip下标
      */
-    private int polling() {
-        if (flag.get() < localAddressTotal - 1) {
-            return flag.incrementAndGet();
+    private synchronized int polling() {
+        if (flag < localAddressTotal - 1) {
+            flag++;
+            return flag;
         } else {
-            flag.set(0);
+            flag = 0;
             return 0;
         }
     }

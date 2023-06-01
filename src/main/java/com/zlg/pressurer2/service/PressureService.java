@@ -56,8 +56,10 @@ public class PressureService {
             logger.debug("futureList size: {}", futureList.size());
             long futureTime = System.currentTimeMillis();
             for (Future<PressureMqttClient> pressureMqttClientFuture : futureList) {
-                PressureMqttClient pressureMqttClient = pressureMqttClientFuture.get();
-                mqttClients.add(pressureMqttClient);
+                if (null != pressureMqttClientFuture) {
+                    PressureMqttClient pressureMqttClient = pressureMqttClientFuture.get();
+                    mqttClients.add(pressureMqttClient);
+                }
             }
             long endTime = System.currentTimeMillis();
             logger.debug("设备全部上线完成,mqttClient 数量: {}, 当前时间戳: {}", mqttClients.size(), endTime);

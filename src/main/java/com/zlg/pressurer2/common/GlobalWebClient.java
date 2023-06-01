@@ -8,7 +8,11 @@ public class GlobalWebClient {
     private static final String BASE_URL = "http://192.168.24.91/v1";
 
     static {
-        WEB_CLIENT = WebClient.builder().baseUrl(BASE_URL).codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(5 * 1024 * 1024)).build();
+        WEB_CLIENT = WebClient
+                .builder()
+                .baseUrl(BASE_URL)
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(5 * 1024 * 1024))
+                .build();
     }
 
     public static WebClient getWebClient() {
