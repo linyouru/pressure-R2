@@ -3,6 +3,7 @@ package com.zlg.pressurer2.controller;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.zlg.pressurer2.common.GlobalMqttClientList;
 import com.zlg.pressurer2.controller.model.ApiBaseResp;
+import com.zlg.pressurer2.controller.model.ApiSandData;
 import com.zlg.pressurer2.pojo.PressureMqttClient;
 import com.zlg.pressurer2.service.PressureService;
 import io.swagger.annotations.Api;
@@ -35,10 +36,10 @@ public class PressureController implements PressureApi {
     }
 
     @Override
-    public ResponseEntity<ApiBaseResp> pressureStart(Integer deviceNumber, String deviceType, Integer part, Integer rest, Integer period, String topic, String data, Integer startUserIndex, Integer startDeviceIndex) {
+    public ResponseEntity<ApiBaseResp> pressureStart(ApiSandData body, Integer deviceNumber, String deviceType, Integer part, Integer rest, Integer period, String topic, Integer startUserIndex, Integer startDeviceIndex) {
         try {
             pressureService.deviceOnline(deviceNumber, deviceType, part, rest, startUserIndex, startDeviceIndex);
-            pressureService.pressureStart(period, topic, data);
+            pressureService.pressureStart(period, topic, body.getData());
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }

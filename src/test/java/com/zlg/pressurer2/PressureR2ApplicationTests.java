@@ -18,9 +18,7 @@ class PressureR2ApplicationTests {
     @Test
     void test() {
 
-        for (int i = 0; i < 10; i++) {
-            System.out.println(polling());
-        }
+        getSendData();
     }
 
     synchronized int polling() {
