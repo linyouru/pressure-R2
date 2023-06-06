@@ -1,6 +1,7 @@
 package com.zlg.pressurer2.service;
 
 
+import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.zlg.pressurer2.common.DeviceSecret;
 import com.zlg.pressurer2.common.GlobalMqttClientList;
 import com.zlg.pressurer2.common.GlobalWebClient;
@@ -9,6 +10,7 @@ import com.zlg.pressurer2.helper.mqtt.SendData;
 import com.zlg.pressurer2.pojo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -23,6 +25,12 @@ public class PressureService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static WebClient webClient = GlobalWebClient.getWebClient();
     private ScheduledFuture<?> scheduledFuture;
+    @Value(value = "${testData.tenantTotal}")
+    private int TEST_TENANT_TOTAL;
+    @Value(value = "${testData.invertTotal}")
+    private int INVERT_TOTAL;
+    @Value(value = "${testData.canCommonTotal}")
+    private int CAN_COMMON_TOTAL;
 
     @Resource
     private AsyncTaskService asyncTaskService;
@@ -66,6 +74,15 @@ public class PressureService {
             logger.debug("总共耗时: {}", endTime - startTime);
             logger.debug("遍历阻塞队列futureList耗时: {}", endTime - futureTime);
             GlobalMqttClientList.mqttClientList = mqttClients;
+
+            //临时修改,给can设备上报通道信息
+//            for (PressureMqttClient mqttClient : mqttClients) {
+//                String sendTopic = "/d2s/" + mqttClient.getTenantName() + "/" + mqttClient.getInfoModelName() + "/" + mqttClient.getThirdThingsId() + "/status";
+//                String data = "\0CANInfo\0{\"CAN7\":{\"IsUpload\":0,\"Type\":0,\"Clk\":0,\"IsDownload\":0,\"Mode\":0,\"Enable\":1},\"CAN6\":{\"IsUpload\":0,\"Type\":0,\"Clk\":0,\"IsDownload\":0,\"Mode\":0,\"Enable\":1},\"CAN5\":{\"IsUpload\":0,\"Type\":0,\"Clk\":0,\"IsDownload\":0,\"Mode\":0,\"Enable\":1},\"CAN4\":{\"IsUpload\":0,\"Type\":0,\"Clk\":0,\"IsDownload\":0,\"Mode\":0,\"Enable\":1},\"CAN3\":{\"IsUpload\":0,\"Type\":0,\"Clk\":0,\"IsDownload\":0,\"Mode\":0,\"Enable\":1},\"CAN2\":{\"IsUpload\":0,\"Type\":0,\"Clk\":0,\"IsDownload\":0,\"Mode\":0,\"Enable\":1},\"CAN1\":{\"IsUpload\":0,\"Type\":0,\"Clk\":0,\"IsDownload\":0,\"Mode\":0,\"Enable\":1},\"CAN0\":{\"IsUpload\":0,\"Type\":0,\"Clk\":0,\"IsDownload\":0,\"Mode\":0,\"Enable\":1}}\0";
+//                byte[] send = data.getBytes();
+//                mqttClient.getMqttClient().publishWith().topic(sendTopic).qos(MqttQos.AT_LEAST_ONCE).payload(send).send();
+//                logger.debug(sendTopic);
+//            }
         } else {
             logger.error("deviceInfoList size is 0");
             throw new BizException(HttpStatus.INTERNAL_SERVER_ERROR, "pressure.1001");
@@ -110,9 +127,9 @@ public class PressureService {
     private ArrayList<DeviceInfo> generatedDeviceInfoList(Integer deviceNumber, String deviceType, Integer startUserIndex, Integer startDeviceIndex) {
         ArrayList<DeviceInfo> deviceInfos = new ArrayList<>(deviceNumber);
         one:
-        for (int i = startUserIndex; i <= 1000; i++) {
+        for (int i = startUserIndex; i <= TEST_TENANT_TOTAL; i++) {
             if ("invert".equals(deviceType)) {
-                for (int j = startDeviceIndex; j <= 500; j++) {
+                for (int j = startDeviceIndex; j <= INVERT_TOTAL; j++) {
                     DeviceInfo deviceInfo = new DeviceInfo();
                     deviceInfo.setTenant_name("pressure" + i);
                     deviceInfo.setThird_things_id("device_invert_" + i + "_" + j);
@@ -122,7 +139,7 @@ public class PressureService {
                     }
                 }
             } else if ("can-common".equals(deviceType)) {
-                for (int j = startDeviceIndex; j <= 2; j++) {
+                for (int j = startDeviceIndex; j <= CAN_COMMON_TOTAL; j++) {
                     DeviceInfo deviceInfo = new DeviceInfo();
                     deviceInfo.setTenant_name("pressure" + i);
                     deviceInfo.setThird_things_id("device_can_" + i + "_" + j);

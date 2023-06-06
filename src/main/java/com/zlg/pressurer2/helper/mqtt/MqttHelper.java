@@ -1,5 +1,6 @@
 package com.zlg.pressurer2.helper.mqtt;
 
+import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
 import org.slf4j.Logger;
@@ -64,6 +65,7 @@ public class MqttHelper {
                     } else {
                         client.publishWith()
                                 .topic("/d2s/" + tenantName + "/" + deviceType + "/" + thirdThingsId + "/online")
+                                .qos(MqttQos.AT_MOST_ONCE)
                                 .payload("设备上线".getBytes())
                                 .send();
                     }

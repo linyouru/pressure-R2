@@ -17,3 +17,8 @@ threadPool:
   corePoolSize: 80
   maxPoolSize:  100
   queueCapacity: 5000
+
+testData:
+  tenantTotal: 1000
+  invertTotal: 1000
+  canCommonTotal: 100
