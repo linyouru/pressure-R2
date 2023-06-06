@@ -9,6 +9,8 @@ import java.util.List;
 
 public class SendData implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    //数据上报最小周期
+    private static final int granule = 100;
     private List<PressureMqttClient> mqttClientList;
     private AsyncTaskService asyncTaskService;
     private Integer period;
@@ -39,12 +41,14 @@ public class SendData implements Runnable {
     public void run() {
 //        logger.debug("[线程ID： {}] 定时任务执行时刻: {}", Thread.currentThread().getId(), System.currentTimeMillis());
         int size = mqttClientList.size();
-        int bucket = size / period;
+        //一个周期内分为多少份
+        int part = period / granule;
+        int bucket = size / part;
         int startIndex = 0;
         int endIndex;
-        for (int i = 1; i <= period; i++) {
+        for (int i = 1; i <= part; i++) {
             long startTime = System.currentTimeMillis();
-            endIndex = i * bucket;
+            endIndex = i == part ? size : i * bucket;
             List<PressureMqttClient> pressureMqttClients = mqttClientList.subList(startIndex, endIndex);
             startIndex = endIndex;
 //            logger.debug("第{}批任务上报,设备数：{}", i, bucket);
@@ -53,9 +57,9 @@ public class SendData implements Runnable {
             }
             long endTime = System.currentTimeMillis();
             long difference = endTime - startTime;
-            if (difference < 1000) {
+            if (difference < granule) {
                 try {
-                    Thread.sleep(1000 - difference);
+                    Thread.sleep(granule - difference);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
