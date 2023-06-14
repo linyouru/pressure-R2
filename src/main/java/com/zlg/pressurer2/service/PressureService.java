@@ -106,7 +106,7 @@ public class PressureService {
         sendData.setSend(send);
         sendData.setTopic(topic);
         ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(4);
-        scheduledFuture = executor.scheduleAtFixedRate(sendData, 0, period, TimeUnit.SECONDS);
+        scheduledFuture = executor.scheduleAtFixedRate(sendData, 0, period, TimeUnit.MILLISECONDS);
     }
 
     public void pressureStop() {

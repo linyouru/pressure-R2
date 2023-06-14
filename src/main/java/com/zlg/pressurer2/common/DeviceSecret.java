@@ -12,7 +12,7 @@ public class DeviceSecret {
 
     static {
         DEVICES_SECRET = new HashMap<>();
-        DEVICES_SECRET.put("invert","12345678");
+        DEVICES_SECRET.put("invert","ASfa@#regksajFAwvI)");
         DEVICES_SECRET.put("can-common","QIOFDSA8#FsQEW21&^=");
     }
 

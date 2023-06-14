@@ -21,4 +21,4 @@ threadPool:
 testData:
   tenantTotal: 1000
   invertTotal: 1000
-  canCommonTotal: 100
+  canCommonTotal: 10

@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 import javax.annotation.Resource;
+import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.concurrent.Future;
 
@@ -59,17 +60,17 @@ public class AsyncTaskService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(parentsJson)
                 .retrieve()
-                .onStatus(HttpStatus::is4xxClientError, resp -> {
-                    logger.error("获取token客户端请求异常[{}],error: {}", resp.statusCode().value(), resp.statusCode().getReasonPhrase());
-                    return Mono.error(new RuntimeException("客户端请求异常"));
-                })
-                .onStatus(HttpStatus::is5xxServerError, resp -> {
-                    logger.error("获取token服务端异常[{}],error: {}", resp.statusCode().value(), resp.statusCode().getReasonPhrase());
-                    return Mono.error(new RuntimeException("服务端异常"));
-                })
+//                .onStatus(HttpStatus::is4xxClientError, resp -> {
+//                    logger.error("获取token客户端请求异常[{}],error: {}", resp.statusCode().value(), resp.statusCode().getReasonPhrase());
+//                    return Mono.error(new RuntimeException("客户端请求异常"));
+//                })
+//                .onStatus(HttpStatus::is5xxServerError, resp -> {
+//                    logger.error("获取token服务端异常[{}],error: {}", resp.statusCode().value(), resp.statusCode().getReasonPhrase());
+//                    return Mono.error(new RuntimeException("服务端异常"));
+//                })
                 .bodyToMono(DeviceTokenRes.class)
                 .doOnError(WebClientResponseException.class, err -> {
-                    logger.error("获取设备[{}]登录token发生错误：" + err.getRawStatusCode() + " " + err.getResponseBodyAsString(), thirdThingsId);
+                    logger.error("获取设备[{}]登录token发生错误：" + err.getRawStatusCode() + " " + err.getResponseBodyAsString(Charset.defaultCharset()), thirdThingsId);
                 })
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)))
                 .onErrorReturn(new DeviceTokenRes());
