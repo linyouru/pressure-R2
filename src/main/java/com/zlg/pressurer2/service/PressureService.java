@@ -126,26 +126,38 @@ public class PressureService {
      */
     private ArrayList<DeviceInfo> generatedDeviceInfoList(Integer deviceNumber, String deviceType, Integer startUserIndex, Integer startDeviceIndex) {
         ArrayList<DeviceInfo> deviceInfos = new ArrayList<>(deviceNumber);
-        one:
-        for (int i = startUserIndex; i <= TEST_TENANT_TOTAL; i++) {
-            if ("invert".equals(deviceType)) {
-                for (int j = startDeviceIndex; j <= INVERT_TOTAL; j++) {
-                    DeviceInfo deviceInfo = new DeviceInfo();
-                    deviceInfo.setTenant_name("pressure" + i);
-                    deviceInfo.setThird_things_id("device_invert_" + i + "_" + j);
-                    deviceInfos.add(deviceInfo);
-                    if (deviceInfos.size() == deviceNumber) {
-                        break one;
-                    }
+        if ("HE_BAT".equals(deviceType)) {
+            for (int i = 1; i <= 100000; i++) {
+                DeviceInfo deviceInfo = new DeviceInfo();
+                deviceInfo.setTenant_name("linyouru");
+                deviceInfo.setThird_things_id("he_bat_" + i);
+                deviceInfos.add(deviceInfo);
+                if (deviceInfos.size() == deviceNumber) {
+                    break;
                 }
-            } else if ("can-common".equals(deviceType)) {
-                for (int j = startDeviceIndex; j <= CAN_COMMON_TOTAL; j++) {
-                    DeviceInfo deviceInfo = new DeviceInfo();
-                    deviceInfo.setTenant_name("pressure" + i);
-                    deviceInfo.setThird_things_id("device_can_" + i + "_" + j);
-                    deviceInfos.add(deviceInfo);
-                    if (deviceInfos.size() == deviceNumber) {
-                        break one;
+            }
+        } else {
+            one:
+            for (int i = startUserIndex; i <= TEST_TENANT_TOTAL; i++) {
+                if ("invert".equals(deviceType)) {
+                    for (int j = startDeviceIndex; j <= INVERT_TOTAL; j++) {
+                        DeviceInfo deviceInfo = new DeviceInfo();
+                        deviceInfo.setTenant_name("pressure" + i);
+                        deviceInfo.setThird_things_id("device_invert_" + i + "_" + j);
+                        deviceInfos.add(deviceInfo);
+                        if (deviceInfos.size() == deviceNumber) {
+                            break one;
+                        }
+                    }
+                } else if ("can-common".equals(deviceType)) {
+                    for (int j = startDeviceIndex; j <= CAN_COMMON_TOTAL; j++) {
+                        DeviceInfo deviceInfo = new DeviceInfo();
+                        deviceInfo.setTenant_name("pressure" + i);
+                        deviceInfo.setThird_things_id("device_can_" + i + "_" + j);
+                        deviceInfos.add(deviceInfo);
+                        if (deviceInfos.size() == deviceNumber) {
+                            break one;
+                        }
                     }
                 }
             }

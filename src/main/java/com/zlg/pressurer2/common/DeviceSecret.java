@@ -14,6 +14,7 @@ public class DeviceSecret {
         DEVICES_SECRET = new HashMap<>();
         DEVICES_SECRET.put("invert","ASfa@#regksajFAwvI)");
         DEVICES_SECRET.put("can-common","QIOFDSA8#FsQEW21&^=");
+        DEVICES_SECRET.put("HE_BAT","12345678");
     }
 
 }
