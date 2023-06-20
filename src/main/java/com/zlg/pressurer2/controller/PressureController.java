@@ -29,10 +29,14 @@ public class PressureController implements PressureApi {
 
         try {
             pressureService.deviceOnline(deviceNumber, deviceType, part, rest, startUserIndex, startDeviceIndex);
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            if(e.getMessage().equals("中途停止任务")){
+                return ResponseEntity.ok(new ApiBaseResp().message("中途停止任务"));
+            } else {
+                throw new RuntimeException(e);
+            }
         }
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(new ApiBaseResp().message("success"));
     }
 
     @Override
@@ -40,10 +44,13 @@ public class PressureController implements PressureApi {
         try {
             pressureService.deviceOnline(deviceNumber, deviceType, part, rest, startUserIndex, startDeviceIndex);
             pressureService.pressureStart(period, topic, body.getData());
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            if(e.getMessage().equals("中途停止任务")){
+                return ResponseEntity.ok(new ApiBaseResp().message("中途停止任务"));
+            } else {
+                throw new RuntimeException(e);
+            }
         }
-
         return ResponseEntity.ok(new ApiBaseResp().message("success"));
     }
 

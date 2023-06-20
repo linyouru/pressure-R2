@@ -31,6 +31,7 @@ public class PressureService {
     private int INVERT_TOTAL;
     @Value(value = "${testData.canCommonTotal}")
     private int CAN_COMMON_TOTAL;
+    private boolean pressureStop;
 
     @Resource
     private AsyncTaskService asyncTaskService;
@@ -43,6 +44,7 @@ public class PressureService {
         String deviceSecret = DeviceSecret.DEVICES_SECRET.get(deviceType);
         int i = 1;
         if (deviceInfoList.size() > 0) {
+            pressureStop = false;
             ArrayList<PressureMqttClient> mqttClients = new ArrayList<>();
             ArrayList<Future<PressureMqttClient>> futureList = new ArrayList<>();
             long startTime = System.currentTimeMillis();
@@ -60,6 +62,9 @@ public class PressureService {
                     Thread.sleep(rest);
                 }
                 i++;
+                if (pressureStop) {
+                    throw new RuntimeException("中途停止任务");
+                }
             }
             logger.debug("futureList size: {}", futureList.size());
             long futureTime = System.currentTimeMillis();
@@ -110,6 +115,7 @@ public class PressureService {
     }
 
     public void pressureStop() {
+        pressureStop = true;
         if (scheduledFuture != null) {
             scheduledFuture.cancel(true);
         }
